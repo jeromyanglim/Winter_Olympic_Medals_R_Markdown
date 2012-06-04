@@ -3,48 +3,51 @@
 
 <!-- Title: How to Convert Sweave LaTeX to knitr R Markdown: Winter Olympic Medals Example -->
 
-The following post shows how to manually convert a Sweave LaTeX document into a knitr R Markdown document. It reviews many of the changes required. It also demonstrates these changes by looking at an analysis of Winter Olympic Medal data up to and including 2006. 
+The following post shows how to manually convert a Sweave LaTeX document into a knitr R Markdown document. The post (1) reviews many of the required changes; (2) provides an example of a document converted to R Markdown format based on an analysis of  Winter Olympic Medal data up to and including 2006; and (3) discusses the pros and cons of LaTeX and Markdown for performing analyses.
 
 <!-- more -->
 
 # Overview
-These analyses have gone through several waves
+The following analyses of Winter Olympic Medals data have gone through several iterations:
 
-* **R Script**: I originally performed [similar analyses in February 2010](http://jeromyanglim.blogspot.com.au/2010/02/analysis-of-winter-olympic-medal-data.html)
-* **LaTeX Sweave**: In February 2011 I adapted the example to make it a Sweave LaTex document. The [source fo this is available on github](https://github.com/jeromyanglim/Sweave_Winter_Olympics).  
-* **R Markdown**: Now in June 2012 I'm using the example to learn about the process of converting a document from Sweave-LaTeX to R Markdown.
+1. **R Script**: I originally performed [similar analyses in February 2010](http://jeromyanglim.blogspot.com.au/2010/02/analysis-of-winter-olympic-medal-data.html). It was a simple set of commands where you could see the console output and view the plots. 
+2. **LaTeX Sweave**: In February 2011 I adapted the example to make it a Sweave LaTex document. The [source fo this is available on github](https://github.com/jeromyanglim/Sweave_Winter_Olympics). With Sweave, I was able to create a document that weaved text, commands, console input, console output, and figures.
+3. **R Markdown**: Now in June 2012 I'm using the example to review the process of converting a document from Sweave-LaTeX to R Markdown. The [souce code is available here on github](https://github.com/jeromyanglim/Winter_Olympic_Medals_R_Markdown) (see the `*.rmd` file). 
 
 
 # Converting from Sweave to R Markdown
-The following lists some of the many things that were required in order to convert a LaTeX Sweave document into an R Markdown document suitable for processing with `knitr` and `RStudio`.
+The following changes were required in order to convert my LaTeX Sweave document into an R Markdown document suitable for processing with `knitr` and `RStudio`. Many of these changes are fairly obvious if you understand LaTeX and Markdown; but a few are less obvious. And obviously there are many additional changes that might be required on other documents.
 
 
 ## R code chunks
 * **R code chunk delimiters:** Update  from  `<< ... >>=` and `@` to R markdown format <code>&#96;&#96;&#96;{r ...}</code> and  <code>&#96;&#96;&#96;</code>
 * **Inline code chunks:** Update from <code>&#92;Sexpr{...}</code> to either <code>&#96;r ...&#96;</code> or <code>&#96;r I(...)&#96;</code> format.
-* **results=tex**: Any `results=tex` needs to either be removed or converted to `results='asis'`. Also note that knitr options that take strings
+* **results=tex**: Any `results=tex` needs to either be removed or converted to `results='asis'`. Note that string values of knitr options need to be quoted.
 * **Boolean options**: Sweave tolerates lower case `true` and `false` for code chunk options, `knitr` requires `TRUE` and `FALSE`.
 
 ## Figures and Tables
 * **Floats**: Remove figure and table floats (e.g., `\begin{table}...\end{table}`, `\begin{figure}...\end{figure}`). In R Markdown and HTML, there are no pages and thus content is just placed immediately in the document.
 * **Figure captions**: Extract content from within the `\caption{}` command. When using R Markdown, it is often easiest to add captions  to the plot itself (e.g., using the `main` argument in base graphics). 
-* **Table captions:** extract content from within the `\caption{}` command; Table captions can be included in a `caption` argument using the `caption` argument to the `xtable` function (e.g., `print(xtable(MY_DAT_FRAME), "html", caption="MY CAPTION", caption.placement="top")` ). Caption placement can defaults to `"bottom"` of table but can be optinally specified as `"top"`. Alternatively table titles can just be included as Markdown text.
-* **References:** Delete table and figure lables (e.g., `\label{...}`). Replace table and figure references (e.g., `\ref{...}` with actual numbers or other descriptive terminology. It would also be possible to implement something simple in R that stored table and figure numbers (e.g., initialise table and figure numbers at the start of the document; increment table counter each time a table is created and likewise for figures; include counter in caption text using `paste()` or something similar. Include counter in text using inline R code chunks.
+* **Table captions:** extract content from within the `\caption{}` command; Table captions can be included in a `caption` argument using the `caption` argument to the `xtable` function (e.g., `print(xtable(MY_DAT_FRAME), "html", caption="MY CAPTION", caption.placement="top")` ). Caption placement defaults to `"bottom"` of table but can be optinally specified as `"top"` either as a global option or in `print.xtable`. Alternatively table titles can just be included as Markdown text.
+* **References:** Delete table and figure lables (e.g., `\label{...}`). Replace table and figure references (e.g., `\ref{...}` with actual numbers or other descriptive terminology. It would also be possible to implement something simple in R that stored table and figure numbers (e.g., initialise table and figure numbers at the start of the document; increment table counter each time a table is created and likewise for figures; store the value of counter in variable; include variable in caption text using `paste()` or something similar. Include counter in text using inline R code chunks.
 * **Table content**: Markdown supports HTML; so one option is to convert LaTeX tables to HTML tables using a function like `print(xtable(MY_DATA_FRAME), type="html")`. This is combined with the `results='asis'` R code chunk option.
 
 ## Basic formatting
 * **Headings**: if we assume `section` is the top level: then `\section{...}` becomes `# ...`,  `\subsection{...}` becomes `## ...` and `\subsubsection{...}` becomes  `### ...`
-* **Mathematics**: Update latex mathematics to `$``latex ...` and `$$``latex $$` notation if using RStudio
+* **Mathematics**: Update latex mathematics to `$``latex ...` and `$$``latex ... $$` notation if using RStudio.
 * **Paragraph delimiters**: If using RStudio then remove single line breaks that were not intended to be paragraph breaks.
 * **Hyperlinks**: Convert LaTeX Hyperlinks from `\href` or `url` to `[text](url)` format.
 
 ## LaTeX things
 * **Comments**: Remove any LaTeX comments or switch from `% comment` to `<!-- comment -->`
 * **LaTeX escaped characters**: Remove unnecessary escape characters (e.g., `\%` is just `%`).
-* **R Markdown escaped characters**: Writing about the R Markdown language in R Markdown sometimes requires the use of HTML codes for special characters such as backticks (`&#96;`) and backslashes (`&#92;`) to prevent the text from being interpreted; see [here for a list](http://www.ascii.cl/htmlcodes.htm).
+* **R Markdown escaped characters**: Writing about the R Markdown language in R Markdown sometimes requires the use of HTML codes for special characters such as backticks (`&#96;`) and backslashes (`&#92;`) to prevent the text from being interpreted; see [here for a list of HTML character codes](http://www.ascii.cl/htmlcodes.htm).
 * **Header**: Remove the LaTeX header information up to and including `\begin{document}`; extract any incorporate any relevant content such as title, abstract, author, date, etc.
 
-# Import Dataset
+# R Markdown Analysis of Winter Olympic Medal Data
+The following shows the output of the actual analysis after running the rmd source through `Knit HTML` in Rstudio. If you're curious, you may wish to view the [rmd source code on GitHub side by side this point at this point](https://github.com/jeromyanglim/Winter_Olympic_Medals_R_Markdown/blob/master/Winter_Olympics.rmd).
+
+## Import Dataset
 
 
 ```r
@@ -60,7 +63,7 @@ medals <- medals[!is.na(medals$Year), ]
 
 The Olympic Medals data frame includes `2311` medals from `1924` to  `2006`.  The data was sourced from [The Guardian Data Blog](http://www.guardian.co.uk/news/datablog/2010/feb/11/winter-olympics-medals-by-country).
 
-# R Markdown Analysis of Winter Olympic Medal Data
+
 ## Total Medals by Year
 
 
@@ -76,14 +79,14 @@ fit <- nls(medals ~ a * pos^b + c, x, start = list(a = 10, b = 1,
 
 
 
-In general over the years the number of Winter Olympic medals awarded has increased.  In order to model this relationship, year was converted to ordinal position.  A three parameter power function seemed plausible, $latex y = ax^b + c$, where $latex y$ is total medals awarded and $latex x$ is the ordinal position of the olympics starting at one.  The best fitting least square parameters were estimated to be
+In general over the years the number of Winter Olympic medals awarded has increased.  In order to model this relationship, year was converted to ordinal position.  A three parameter power function seemed plausible, $latex y = ax^b + c$, where $latex y$ is total medals awarded and $latex x$ is the ordinal position of the olympics starting at one.  The best fitting parameters by least-squares were
 
 $$latex 
 0.202 
 x^{2.297 + 50.987}.
 $$
 
-The figure displays the data and the fit of the model. The model predicts that 2010, 2014, and 2018 would have  `271`,  `295`, and `322` medals  respectively.
+The figure displays the data and the line of best fit for the model. The model predicts that 2010, 2014, and 2018 would have  `271`,  `295`, and `322` medals  respectively.
                       
 
 
@@ -99,7 +102,7 @@ plot(medals ~ pos, x,  las = 1,
 lines(x$pos, predict(fit))
 ```
 
-![plot of chunk figure_of_medals](figure/figure_of_medals.png) 
+![plot of chunk figure_of_medals](http://i.imgur.com/atTmh.png) 
 
         
 
@@ -139,7 +142,7 @@ points(medalsByYearByGender[medalsByYearByGender$Event.gender ==
     "W", "x"], col = "red", pch = "f")
 ```
 
-![plot of chunk fgenderRatioByYear_figure](figure/fgenderRatioByYear_figure.png) 
+![plot of chunk fgenderRatioByYear_figure](http://i.imgur.com/idGC7.png) 
 
 
 
@@ -156,7 +159,7 @@ print(xtable(propf$table,
 ```
 
 <!-- html table generated in R 2.15.0 by xtable 1.7-0 package -->
-<!-- Mon Jun  4 20:54:23 2012 -->
+<!-- Mon Jun  4 22:14:27 2012 -->
 <TABLE align="center">
 <CAPTION ALIGN="top"> Proportion of Medals that were awarded to Females by Year </CAPTION>
 <TR> <TH>  </TH> <TH> Year </TH> <TH> Prop. Female </TH>  </TR>
@@ -213,12 +216,13 @@ Norway has won the most medals with `280` (`12.12`%). The table shows the top 10
 
 
 ```r
-print(xtable(cmm$table, caption = "Rankings of Medals Won by Country"), 
-    "html", include.rownames = FALSE, caption.placement = "top", html.table.attributes = "align=\"center\"")
+print(xtable(cmm$table, caption="Rankings of Medals Won by Country"), 
+      "html", include.rownames=FALSE, caption.placement='top',
+      html.table.attributes='align="center"')
 ```
 
 <!-- html table generated in R 2.15.0 by xtable 1.7-0 package -->
-<!-- Mon Jun  4 20:54:23 2012 -->
+<!-- Mon Jun  4 22:14:27 2012 -->
 <TABLE align="center">
 <CAPTION ALIGN="top"> Rankings of Medals Won by Country </CAPTION>
 <TR> <TH> Rank </TH> <TH> Country </TH> <TH> Total </TH> <TH> % </TH>  </TR>
@@ -254,7 +258,7 @@ barplot(round(t(medalsByMedalByNOC), 2), horiz = TRUE, las = 1,
         main="Proportion of medals won that were gold, silver or bronze.")
 ```
 
-![plot of chunk proportion_gold](figure/proportion_gold.png) 
+![plot of chunk proportion_gold](http://i.imgur.com/L7f1C.png) 
 
 
 
@@ -282,7 +286,7 @@ plot(x = names(totalNocByYear), totalNocByYear, ylim = c(0, max(totalNocByYear))
     ylab = "Total Number of Countries", bty = "l")
 ```
 
-![plot of chunk figure_total_medals](figure/figure_total_medals.png) 
+![plot of chunk figure_total_medals](http://i.imgur.com/VKzmi.png) 
 
 
 
@@ -305,13 +309,17 @@ Given that I am an Australian I decided to have a look at the Australian medal c
 
 
 ```r
-print(xtable(ausmedals$table, caption = "List of Australian Medals", 
-    digits = 0), type = "html", caption.placement = "top", include.rownames = FALSE, 
-    html.table.attributes = "align=\"center\"")
+print(xtable(ausmedals$table, 
+             caption='List of Australian Medals',
+             digits=0),
+      type='html', 
+      caption.placement='top', 
+      include.rownames=FALSE,
+      html.table.attributes='align="center"') 
 ```
 
 <!-- html table generated in R 2.15.0 by xtable 1.7-0 package -->
-<!-- Mon Jun  4 20:54:23 2012 -->
+<!-- Mon Jun  4 22:15:10 2012 -->
 <TABLE align="center">
 <CAPTION ALIGN="top"> List of Australian Medals </CAPTION>
 <TR> <TH> Year </TH> <TH> City </TH> <TH> Discipline </TH> <TH> Event </TH> <TH> Medal </TH>  </TR>
@@ -370,7 +378,7 @@ print(xtable(icetab$data,
 ```
 
 <!-- html table generated in R 2.15.0 by xtable 1.7-0 package -->
-<!-- Mon Jun  4 20:54:23 2012 -->
+<!-- Mon Jun  4 22:15:10 2012 -->
 <TABLE align="center">
 <CAPTION ALIGN="top"> Country Winning Gold and Silver Medals by Year in Mens Ice Hockey </CAPTION>
 <TR> <TH> Year </TH> <TH> Gold </TH> <TH> Silver </TH>  </TR>
@@ -403,13 +411,20 @@ print(xtable(icetab$data,
      * I prefer performing analyses with Markdown than I do with LateX. 
      * Markdown is easier to type than LaTeX. 
      * Markdown is easier to read than LaTeX.
-     * Many analyses are only presented on the computer and as such page breaks in LaTeX are a nuisance. This extends to many features of LaTeX such as headers, figure and table placement, margins, table formatting, partiuclarly for long or wide tables, and so on.
+     * It is easier with Markdown to get started with analyses.
+     * Many analyses are only presented on the screen and as such page breaks in LaTeX are a nuisance. This extends to many features of LaTeX such as headers, figure and table placement, margins, table formatting, partiuclarly for long or wide tables, and so on.
+     * That said, journal articles, books, and other artefacts that are bound to the model of a printed page are not going anywhere. 
+     * Furthermore, bibliographies, cross-references, elaborate control of table appearance, and more are all features which LaTeX makes easier than Markdown.
 * R Markdown to Sweave LaTeX:
     * The more common conversion task that I can imagine is taking some simple analyses in R Markdown and having to convert them into knitr LaTeX in order to include the content in a journal article.
-    * The first time I converted between the formats, it was good to do it in a relatively manual way to get a sense of all the required changes; however, if I had a large document or was doing the task on subsequent occasions, I would look at more automated solutions using string replacement tools (e.g., sed, or even just commands in Vim), and markup conversion tools (e.g., pandoc).
+    * The first time I converted between the formats, it was good to do it in a relatively manual way to get a sense of all the required changes; however, if I had a large document or was doing the task on subsequent occasions, I would look at more automated solutions using string replacement tools (e.g., sed, or even just replacement commands in a text editor such as Vim), and markup conversion tools (e.g., pandoc).
+    * Perhaps if the formats get popular enough, developers will start to build dedicated conversion tools.
 
 
 # Additional Resources
-* [Getting Started with R Markdown, knitr, and Rstudio 0.96](http://jeromyanglim.blogspot.com/2012/05/getting-started-with-r-markdown-knitr.html)
-* [Example Reproducible Report using R Markdown: Analysis of California Schools Test Data](http://jeromyanglim.blogspot.com/2012/05/example-reproducile-report-using-r.html)
-* [Assorted posts using Sweave](http://jeromyanglim.blogspot.com.au/search/label/Sweave)
+If you liked this post, you may want to subscribe to the [RSS feed of my blog](http://feeds.feedburner.com/jeromyanglim). Also see:
+* This post on [Getting Started with R Markdown, knitr, and Rstudio 0.96](http://jeromyanglim.blogspot.com/2012/05/getting-started-with-r-markdown-knitr.html)
+* This post for another [Example Reproducible Report using R Markdown which analyses California Schools Test Data](http://jeromyanglim.blogspot.com/2012/05/example-reproducile-report-using-r.html)
+* These [Assorted posts using Sweave](http://jeromyanglim.blogspot.com.au/search/label/Sweave)
+* The [knitr](http://yihui.name/knitr/) home page and [knitr options page](http://yihui.name/knitr/options).
+* the [xtable LaTeX table gallery](http://cran.r-project.org/web/packages/xtable/vignettes/xtableGallery.pdf) which can also be used to generate HTML tables for inclusion in Markdown.

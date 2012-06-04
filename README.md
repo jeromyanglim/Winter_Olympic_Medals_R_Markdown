@@ -1,7 +1,6 @@
 
 ### R Markdown Example: Winter Olympics Medals
-This is an updated version of a Sweave example showing how to implement the
-equivalent code using R Markdown.
+This is an updated version of a Sweave example showing how to implement the equivalent code using R Markdown.  For more information and details on the original post go to <http://jeromyanglim.blogspot.com>
 
 
 ## Licence
